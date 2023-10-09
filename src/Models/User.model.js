@@ -7,7 +7,7 @@ password: {type: String, required: true},
 phone_number: {type: Number, required: true},
 }, {
     timeStamps: true,
-    versionKeys: false
+    versionKey: false
 });
 
 const userModel = mongoose.model('User', userSchema);
