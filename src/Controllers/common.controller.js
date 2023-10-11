@@ -30,13 +30,13 @@ router.post('/login', [validateReqObj, validateEmailId] , async(req, res) => {
     try {
         const user = await userModel.findOne({email_ID: req?.body?.email_ID});
         if(!user){
-            return res.status(401).send('User does not registered!')
+            return res.status(404).send('User does not registered!')
         }
         const {msg, token: bearerToken} = await checkPassword(req?.body, user?.password);
         if(!msg){
-            return res.status(400).send('Invalid Password!')
+            return res.status(401).send('Invalid Password!')
         }
-       return res.status(200).send({user: await userModel.findOne({email_ID: req?.body?.email_ID}).select('-password -_id'),
+       return res.status(200).send({user: await userModel.findOne({email_ID: req?.body?.email_ID}).select('-password'),
        bearerToken});
     } catch (error) {
          console.error(error);
@@ -66,4 +66,22 @@ router.post('/property', [validateReqObj, validateAuth], async(req, res) => {
     }
 })
 
+// update  property
+router.put('/property/:id', [validateReqObj, validateAuth], async(req, res) => {
+    try {
+        const {owner_ID} = req.body;
+        const targetProperty  = await propertyModel.findOne({_id: req?.params?.id});
+        if(!targetProperty){
+            return res.status(404).send('Requested Property does not exist!')
+        }
+        if(targetProperty['owner_ID'].toString() !== owner_ID){
+            return res.status(401).send("You do not have the required permissions to update this property!")
+        }
+        const updatedProperty = await propertyModel.findByIdAndUpdate(req?.params?.id, req.body);
+        return res.status(200).send("Successfully Updated the Property!")
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Internal Server Error")
+    }
+})
 module.exports = router;
