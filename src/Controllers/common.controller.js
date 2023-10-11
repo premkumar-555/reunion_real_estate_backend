@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userModel = require('../Models/User.model');
+const propertyModel = require('../Models/Property.model')
 const validateReqObj = require('../Middlewares/validateReqObj')
 const signup = require('../Middlewares/signup')
 const validateEmailId = require('../Middlewares/validateEmail')
@@ -18,7 +19,8 @@ router.post('/signup', [validateReqObj, signup, validateEmailId], async(req, res
      const user = await userModel.create(req.body);
      return res.status(200).send('Signup done successfully');
     } catch (error) {
-    return res.status(500).send(error.message)
+    console.error(error);
+    return res.status(500).send("Internal Server Error")
     }
 })
 
@@ -36,7 +38,19 @@ router.post('/login', [validateReqObj, validateEmailId] , async(req, res) => {
        return res.status(200).send({user: await userModel.findOne({email_ID: req?.body?.email_ID}).select('-password -_id'),
        bearerToken});
     } catch (error) {
-        return res.status(500).send(error.message)
+         console.error(error);
+         return res.status(500).send("Internal Server Error")
+    }
+})
+
+// fetch all available properties
+router.get('/list-properties', async(req, res) => {
+    try {
+        const properties = await propertyModel.find({});
+        return res.status(200).send(properties)
+    } catch (error) {
+         console.error(error);
+         return res.status(500).send("Internal Server Error")
     }
 })
 
