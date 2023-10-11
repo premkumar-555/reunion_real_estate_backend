@@ -103,4 +103,26 @@ router.delete('/property/:id', [validateReqObj, validateAuth], async(req, res) =
         return res.status(500).send("Internal Server Error")
     }
 })
+
+// list owner's properties
+router.get('/property', [validateReqObj, validateAuth], async(req, res) => {
+    try {
+        const ownerId = req?.query?.owner_ID;
+        if(!ownerId){
+            return res.status(400).send('Owner Id is missing in the query!')
+        }
+        const targetOwner = await userModel.findOne({_id: ownerId});
+        if(!targetOwner){
+            return res.status(401).send('Owner does not exist!')
+        }
+        const properties = await propertyModel.find({owner_ID: ownerId});
+        if(!properties.length){
+            return res.status(400).send('No Properties exist for this owner')
+        }
+        return res.status(200).send(properties)
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Internal Server Error")
+    }
+})
 module.exports = router;
