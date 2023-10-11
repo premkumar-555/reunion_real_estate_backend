@@ -6,6 +6,7 @@ const validateReqObj = require('../Middlewares/validateReqObj')
 const signup = require('../Middlewares/signup')
 const validateEmailId = require('../Middlewares/validateEmail')
 const checkPassword = require('../customLogics/login')
+const validateAuth = require('../Middlewares/validateAuth')
 // user signup api
 router.post('/signup', [validateReqObj, signup, validateEmailId], async(req, res) => {
     try {
@@ -46,11 +47,22 @@ router.post('/login', [validateReqObj, validateEmailId] , async(req, res) => {
 // fetch all available properties
 router.get('/list-properties', async(req, res) => {
     try {
-        const properties = await propertyModel.find({});
+        const properties = await propertyModel.find().populate({path: 'owner_ID', select: '-password'});
         return res.status(200).send(properties)
     } catch (error) {
          console.error(error);
          return res.status(500).send("Internal Server Error")
+    }
+})
+
+// add properties
+router.post('/property', [validateReqObj, validateAuth], async(req, res) => {
+    try {
+        const property = await propertyModel.create(req.body);
+        return res.status(200).send('Successfully Added Property to Portal!')
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Internal Server Error")
     }
 })
 

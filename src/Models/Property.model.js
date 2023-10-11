@@ -10,7 +10,7 @@ bath_rooms: {type: Number, required: true},
 location: {type: String, required: true},
 city: {type: String, required: true},
 available_from: {type: Date, required: true},
-owner_ID: {type: mongoose.Schema.Types.ObjectId, required: true},
+owner_ID: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
 }, {
     timeStamps: true,
     versionKeys: false
@@ -19,3 +19,7 @@ owner_ID: {type: mongoose.Schema.Types.ObjectId, required: true},
 const propertyModel = mongoose.model('Property', propertySchema);
 
 module.exports = propertyModel;
+
+/*
+,
+*/
