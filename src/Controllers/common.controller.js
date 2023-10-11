@@ -84,4 +84,23 @@ router.put('/property/:id', [validateReqObj, validateAuth], async(req, res) => {
         return res.status(500).send("Internal Server Error")
     }
 })
+
+// delete property
+router.delete('/property/:id', [validateReqObj, validateAuth], async(req, res) => {
+    try {
+        const {owner_ID} = req.body;
+        const targetProperty  = await propertyModel.findOne({_id: req?.params?.id});
+        if(!targetProperty){
+            return res.status(404).send('Requested Property does not exist!')
+        }
+        if(targetProperty['owner_ID'].toString() !== owner_ID){
+            return res.status(401).send("You do not have the required permissions to update this property!")
+        }
+        const deletedProperty = await propertyModel.findByIdAndDelete(req?.params?.id);
+        return res.status(200).send("Successfully Deleted the Property!")
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Internal Server Error")
+    }
+})
 module.exports = router;
